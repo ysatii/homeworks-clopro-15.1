@@ -238,12 +238,12 @@ resource "yandex_compute_instance" "private_vm" {
   }
 }
 ```
-имя  машины -  **private-vm**
-метаданные из файла   **meta_web.yml**
-колличество ядер -**2** 
-память - **2 ГБ**
-использование ядра - **50 %** 
-network_interface, nat = false - **нет внешнего ип**
+имя  машины -  **private-vm**  
+метаданные из файла   **meta_web.yml**  
+колличество ядер -**2**   
+память - **2 ГБ**  
+использование ядра - **50 %**  
+network_interface, nat = false - **нет внешнего ип**  
 -----
 
 5. providers.tf  - содержит описание облачного провайдера 
@@ -320,6 +320,22 @@ variable "image_id_nat" {
   default     = "fd80mrhj8fl2oe87o4e1"
 }
 ```
+-----
+
+7.  versions.tf - описание версии провайдера yandex-cloud/yandex  
+```
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    yandex = {
+      source  = "yandex-cloud/yandex"
+      version = "~> 0.129" # актуальная на момент написания ветка
+    }
+  }
+}
+```
+
+
 
 
 
