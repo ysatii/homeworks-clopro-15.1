@@ -30,7 +30,15 @@ Resource Terraform для Yandex Cloud:
 - [Compute Instance](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance).
 
 ---
+
+Решение 1
+
+решение доступно по ссылке 
+[решение 1](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/task1/README.md)
+
  
+
+
 ### Задание 2. AWS* (задание со звёздочкой)
 
 Это необязательное задание. Его выполнение не влияет на получение зачёта по домашней работе.

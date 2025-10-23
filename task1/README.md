@@ -367,7 +367,7 @@ private_vm_internal_ip = "192.168.20.34"
 ```
 ssh lamer@$(terraform output -raw nat_public_ip)
 ```
-![Рисунок 11](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img11.jpg)
+![Рисунок 11](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img11.jpg)  
 Машина в работе! интернет присутвует! машина с приватной сети пингуеться!
 -----
 
