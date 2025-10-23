@@ -379,3 +379,8 @@ ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -ra
 ```
 ![Рисунок 12](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img12.jpg)
 
+
+Уничтожим созданные сети и виртуальные машины
+```
+terraform destroy -auto-approve
+```
