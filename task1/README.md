@@ -359,7 +359,7 @@ private_vm_internal_ip = "192.168.20.34"
 ### Карта оболачной сети
 ![Рисунок 9](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img9.jpg)
 ![Рисунок 10](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img10.jpg)
-
+-----
 
 
 ## Произвдем подключение к машине nat-instance имеющей внешней адрес  
@@ -368,13 +368,14 @@ private_vm_internal_ip = "192.168.20.34"
 ssh lamer@$(terraform output -raw nat_public_ip)
 ```
 ![Рисунок 11](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img11.jpg)
-
+Машина в работе! интернет присутвует! машина с приватной сети пингуеться!
+-----
 
  
-
+## Произвдем подключение к машине private-vm yt имеющей внешнего адреса
+### произведем подключение, проверим наличие интернета и пинг к машине nat-instance
+```
 ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
-### hostname
-# → private-vm
-
-
+```
+![Рисунок 12](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img12.jpg)
 
