@@ -82,9 +82,12 @@ resource "yandex_compute_instance" "nat" {
     security_group_ids = [yandex_vpc_security_group.allow_ssh_icmp.id]
   }
 
-  metadata = {
-    user-data = "${file("./meta_web.yml")}"
-  }
+ metadata = {
+  user-data = templatefile("${path.module}/meta_web.yml", {
+    vm_user        = var.vm_user
+    ssh_public_key = var.ssh_public_key
+  })
+}
 }
 
 # ----------------------------

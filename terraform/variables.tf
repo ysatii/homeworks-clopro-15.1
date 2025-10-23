@@ -41,6 +41,7 @@ variable "vm_user"      {
     type = string
     default = "lamer" 
 }
+
 variable "ssh_public_key" {
   type        = string
   default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJ/8nl4RWFm+0oXUDpUSjuOP3AHCl2E/af1CpzwhtO6 lamer@lamer-VirtualBox"

@@ -334,11 +334,11 @@ terraform apply -auto-approve
 
 ![Рисунок 1](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img1.jpg)
 ип адреса машины с внешним адресом  
-nat_internal_ip = "192.168.10.254"  
-nat_public_ip = "51.250.67.106"  
+nat_internal_ip = "192.168.10.254"
+nat_public_ip = "84.252.129.23"
 
 ип адреса машины в приватной сети  
-private_vm_internal_ip = "192.168.20.17"  
+private_vm_internal_ip = "192.168.20.34"  
 
 ## Посмотрим что создалось в облаке 
 ### виртуальные машины 
@@ -358,14 +358,19 @@ private_vm_internal_ip = "192.168.20.17"
 
 ### Карта оболачной сети
 ![Рисунок 9](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img9.jpg)
+![Рисунок 10](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img10.jpg)
 
 
 
-
+## Произвдем подключение к машине nat-instance имеющей внешней адрес  
+### подлючимся к машине проверим наличие интернета и пропингуем машину из приватной сети
+```
 ssh lamer@$(terraform output -raw nat_public_ip)
+```
+![Рисунок 11](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img11.jpg)
 
-### hostname
-# → nat-instance
+
+ 
 
 ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
 ### hostname

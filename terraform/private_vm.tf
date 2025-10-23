@@ -31,6 +31,9 @@ resource "yandex_compute_instance" "private_vm" {
   }
 
   metadata = {
-    user-data = "${file("./meta_web.yml")}"
-  }
+  user-data = templatefile("${path.module}/meta_web.yml", {
+    vm_user        = var.vm_user
+    ssh_public_key = var.ssh_public_key
+  })
+}
 }
