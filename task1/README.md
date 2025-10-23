@@ -21,18 +21,6 @@ Resource Terraform для Yandex Cloud:
 
 ---
 
-cd terraform
-terraform plan
-terraform apply -auto-approve
-
-ssh lamer@$(terraform output -raw nat_public_ip)
-
-### hostname
-# → nat-instance
-
-ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
-### hostname
-# → private-vm
 
 # Ответ 1
 Для решения данной задчи нам понядобиться следущая файловая структура 
@@ -336,6 +324,43 @@ terraform {
 ```
 
 
+## произвдем запуск 
+```
+cd terraform
+terraform init 
+terraform plan
+terraform apply -auto-approve
+```
+
+![Рисунок 1](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img1.jpg)
+ип адреса машины с внешним адресом 
+nat_internal_ip = "192.168.10.254"
+nat_public_ip = "51.250.67.106"
+
+ип адреса машины в приватной сети
+private_vm_internal_ip = "192.168.20.17"
+
+## Посмотрим что создалось в облаке 
+![Рисунок 2](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img2.jpg)
+![Рисунок 3](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img3.jpg)
+![Рисунок 4](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img4.jpg)
+![Рисунок 5](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img5.jpg)
+![Рисунок 6](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img6.jpg)
+![Рисунок 7](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img7.jpg)
+![Рисунок 8](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img8.jpg)
+![Рисунок 9](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img9.jpg)
+
+
+
+
+ssh lamer@$(terraform output -raw nat_public_ip)
+
+### hostname
+# → nat-instance
+
+ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
+### hostname
+# → private-vm
 
 
 
