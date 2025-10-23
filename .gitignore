@@ -1,0 +1,40 @@
+# Local .terraform directories and files
+**/.terraform/*
+.terraform*
+
+!.terraformrc
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# own secret vars store.
+personal.auto.tfvars
+
+
+# Файлы с секретами и автоподстановкой переменных
+*.auto.tfvars
+*.auto.tfvars.json
+*.tfvars
+
+# Файл CLI-конфигурации Terraform (если используется)
+.terraformrc
+terraform.rc
+
+# Логи
+crash.log
+
+# Backup-файлы Terraform
+*.backup
+*.tfplan
+
+# Личные файлы конфигурации (если такие есть)
+personal.auto.tfvars
+
+# Прочие IDE/системные файлы (опционально)
+*.DS_Store
+.idea/
+.vscode/
+terraform.tfvars
+
+tfplan
