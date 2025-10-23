@@ -1,14 +1,4 @@
-# Домашнее задание к занятию «Организация сети»
-
-### Подготовка к выполнению задания
-
-1. Домашнее задание состоит из обязательной части, которую нужно выполнить на провайдере Yandex Cloud, и дополнительной части в AWS (выполняется по желанию). 
-2. Все домашние задания в блоке 15 связаны друг с другом и в конце представляют пример законченной инфраструктуры.  
-3. Все задания нужно выполнить с помощью Terraform. Результатом выполненного домашнего задания будет код в репозитории. 
-4. Перед началом работы настройте доступ к облачным ресурсам из Terraform, используя материалы прошлых лекций и домашнее задание по теме «Облачные провайдеры и синтаксис Terraform». Заранее выберите регион (в случае AWS) и зону.
-
----
-### Задание 1. Yandex Cloud 
+# Задание 1. Yandex Cloud 
 
 **Что нужно сделать**
 
@@ -37,57 +27,225 @@ terraform apply -auto-approve
 
 ssh lamer@$(terraform output -raw nat_public_ip)
 
-## hostname
+### hostname
 # → nat-instance
 
 ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
-## hostname
+### hostname
 # → private-vm
 
+# Ответ 1
+Для решения данной задчи нам понядобиться следущая файловая структура 
+```
+── main.tf
+├── meta_web.yml
+├── outputs.tf
+├── personal.auto.tfvars
+├── private_vm.tf
+├── providers.tf
+├── terraform.tfstate
+├── terraform.tfstate.backup
+├── variables.tf
+└── versions.tf
+```
+
+1. main.tf - содержит блок 
+создание сети и под сети 
+```
+# ----------------------------
+# VPC и подсети
+# ----------------------------
+resource "yandex_vpc_network" "this" {
+  name = "network-1"
+}
+
+resource "yandex_vpc_subnet" "public" {
+  name           = "public"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.this.id
+  v4_cidr_blocks = [var.public_cidr]
+}
+
+# Маршрутная таблица для private добавим позже; привяжем её к этой подсети ниже
+resource "yandex_vpc_subnet" "private" {
+  name           = "private"
+  zone           = var.zone
+  network_id     = yandex_vpc_network.this.id
+  v4_cidr_blocks = [var.private_cidr]
+  # route_table_id = будет добавлен после создания таблицы
+  route_table_id = yandex_vpc_route_table.private_via_nat.id
+}
+```
+
+Security Group: SSH + ICMP
+```
+# ----------------------------
+# Security Group: SSH + ICMP
+# ----------------------------
+resource "yandex_vpc_security_group" "allow_ssh_icmp" {
+  name       = "allow-ssh-icmp"
+  network_id = yandex_vpc_network.this.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "SSH"
+    port           = 22
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol       = "ICMP"
+    description    = "ICMP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol       = "ANY"
+    description    = "all egress"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+NAT-инстанс (bastion)
+```
+# ----------------------------
+# NAT-инстанс (bastion)
+# ----------------------------
+resource "yandex_compute_instance" "nat" {
+  name        = "nat-instance"
+  hostname    = "nat-instance"
+  platform_id = "standard-v3"
+  zone        = var.zone
+
+  resources {
+    cores  = 2
+    memory = 2
+    core_fraction = 50
+  }
+
+  scheduling_policy {
+    preemptible = true
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = var.image_id_nat
+      size     = 10
+    }
+  }
+
+  network_interface {
+    subnet_id  = yandex_vpc_subnet.public.id
+    nat        = true
+    ip_address = var.nat_internal_ip
+    security_group_ids = [yandex_vpc_security_group.allow_ssh_icmp.id]
+  }
+
+  metadata = {
+    user-data = "${file("./meta_web.yml")}"
+  }
+}
+```
+
+таблица маршрутизации
+```
+# ----------------------------
+# Route table: private -> NAT instance
+# ----------------------------
+resource "yandex_vpc_route_table" "private_via_nat" {
+  network_id = yandex_vpc_network.this.id
+
+  static_route {
+    destination_prefix = "0.0.0.0/0"
+    next_hop_address   = var.nat_internal_ip
+  }
+}
+
+# Привязываем таблицу к private-подсети
+```
+------
+
+2. meta_web.yml содержит метаинформацию для создания машин
+```
+#cloud-config
+users:
+  - name: lamer
+    groups: sudo
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    ssh_authorized_keys:
+      - ${var.ssh_public_key}
+```
+
+3. outputs.tf - выводит переменные в которых содержаться ип адреса виртуальных машин
+```
+output "nat_public_ip" {
+  value       = yandex_compute_instance.nat.network_interface[0].nat_ip_address
+  description = "NAT instance public IP"
+}
+
+ 
+
+output "private_vm_internal_ip" {
+  value       = yandex_compute_instance.private_vm.network_interface[0].ip_address
+  description = "Private VM internal IP"
+}
+
+output "nat_internal_ip" {
+  value       = yandex_compute_instance.nat.network_interface[0].ip_address
+  description = "NAT instance internal IP (should be 192.168.10.254)"
+}
+```
+------
+
+4.  private_vm.tf  создает машину внутри приватной сети 
+```
+# ----------------------------
+# Private VM (только внутр. адрес)
+# ----------------------------
+resource "yandex_compute_instance" "private_vm" {
+  name        = "private-vm"
+  hostname    = "private-vm"
+  platform_id = "standard-v3"
+  zone        = var.zone
+
+  resources {
+    cores  = 2
+    memory = 2
+    core_fraction = 50
+  }
+
+  scheduling_policy {
+    preemptible = true
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = var.image_id_ubuntu
+      size     = 10
+    }
+  }
+
+  network_interface {
+    subnet_id           = yandex_vpc_subnet.private.id
+    nat                 = false
+    security_group_ids  = [yandex_vpc_security_group.allow_ssh_icmp.id]
+  }
+
+  metadata = {
+    user-data = "${file("./meta_web.yml")}"
+  }
+}
+```
+имя  машины -  **private-vm**
+метаданные из файла   **meta_web.yml**
+колличество ядер -**2** 
+память - **2 ГБ**
+использование ядра - **50 %** 
+network_interface, nat = false - **нет внешнего ип**
+-----
 
 
 
 
-
-
-
-
-
-
-
-
-
-### Задание 2. AWS* (задание со звёздочкой)
-
-Это необязательное задание. Его выполнение не влияет на получение зачёта по домашней работе.
-
-**Что нужно сделать**
-
-1. Создать пустую VPC с подсетью 10.10.0.0/16.
-2. Публичная подсеть.
-
- - Создать в VPC subnet с названием public, сетью 10.10.1.0/24.
- - Разрешить в этой subnet присвоение public IP по-умолчанию.
- - Создать Internet gateway.
- - Добавить в таблицу маршрутизации маршрут, направляющий весь исходящий трафик в Internet gateway.
- - Создать security group с разрешающими правилами на SSH и ICMP. Привязать эту security group на все, создаваемые в этом ДЗ, виртуалки.
- - Создать в этой подсети виртуалку и убедиться, что инстанс имеет публичный IP. Подключиться к ней, убедиться, что есть доступ к интернету.
- - Добавить NAT gateway в public subnet.
-3. Приватная подсеть.
- - Создать в VPC subnet с названием private, сетью 10.10.2.0/24.
- - Создать отдельную таблицу маршрутизации и привязать её к private подсети.
- - Добавить Route, направляющий весь исходящий трафик private сети в NAT.
- - Создать виртуалку в приватной сети.
- - Подключиться к ней по SSH по приватному IP через виртуалку, созданную ранее в публичной подсети, и убедиться, что с виртуалки есть выход в интернет.
-
-Resource Terraform:
-
-1. [VPC](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc).
-1. [Subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet).
-1. [Internet Gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway).
-
-### Правила приёма работы
-
-Домашняя работа оформляется в своём Git репозитории в файле README.md. Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-Файл README.md должен содержать скриншоты вывода необходимых команд, а также скриншоты результатов.
-Репозиторий должен содержать тексты манифестов или ссылки на них в файле README.md.

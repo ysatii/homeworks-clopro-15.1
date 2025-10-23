@@ -1,4 +1,4 @@
-# Домашнее задание к занятию «Организация сети»
+# Домашнее задание к занятию «Организация сети» - Мельник Юрий Александрович
 
 ### Подготовка к выполнению задания
 
@@ -30,33 +30,7 @@ Resource Terraform для Yandex Cloud:
 - [Compute Instance](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance).
 
 ---
-
-cd terraform
-terraform plan
-terraform apply -auto-approve
-
-ssh lamer@$(terraform output -raw nat_public_ip)
-
-## hostname
-# → nat-instance
-
-ssh -J lamer@$(terraform output -raw nat_public_ip) lamer@$(terraform output -raw private_vm_internal_ip)
-## hostname
-# → private-vm
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 ### Задание 2. AWS* (задание со звёздочкой)
 
 Это необязательное задание. Его выполнение не влияет на получение зачёта по домашней работе.
