@@ -226,12 +226,12 @@ resource "yandex_compute_instance" "private_vm" {
   }
 }
 ```
-имя  машины -  **private-vm**  
-метаданные из файла   **meta_web.yml**  
-колличество ядер -**2**   
-память - **2 ГБ**  
-использование ядра - **50 %**  
-network_interface, nat = false - **нет внешнего ип**  
+### имя  машины -  **private-vm**  
+### метаданные из файла   **meta_web.yml**  
+### колличество ядер -**2**   
+### память - **2 ГБ**  
+### использование ядра - **50 %**  
+### network_interface, nat = false - **нет внешнего ип**  
 -----
 
 5. providers.tf  - содержит описание облачного провайдера 
@@ -324,7 +324,7 @@ terraform {
 ```
 
 
-## произвдем запуск 
+## Произвдем запуск 
 ```
 cd terraform
 terraform init 
@@ -333,21 +333,30 @@ terraform apply -auto-approve
 ```
 
 ![Рисунок 1](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img1.jpg)
-ип адреса машины с внешним адресом 
-nat_internal_ip = "192.168.10.254"
-nat_public_ip = "51.250.67.106"
+ип адреса машины с внешним адресом  
+nat_internal_ip = "192.168.10.254"  
+nat_public_ip = "51.250.67.106"  
 
-ип адреса машины в приватной сети
-private_vm_internal_ip = "192.168.20.17"
+ип адреса машины в приватной сети  
+private_vm_internal_ip = "192.168.20.17"  
 
 ## Посмотрим что создалось в облаке 
-![Рисунок 2](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img2.jpg)
-![Рисунок 3](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img3.jpg)
-![Рисунок 4](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img4.jpg)
+### виртуальные машины 
+![Рисунок 2](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img2.jpg)  
+![Рисунок 3](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img3.jpg)  
+![Рисунок 4](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img4.jpg)  
+
+### Виртуальные  стети
 ![Рисунок 5](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img5.jpg)
 ![Рисунок 6](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img6.jpg)
+
+### Таблицы маршрутизации
 ![Рисунок 7](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img7.jpg)
+
+### Группы безопастности
 ![Рисунок 8](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img8.jpg)
+
+### Карта оболачной сети
 ![Рисунок 9](https://github.com/ysatii/homeworks-clopro-15.1/blob/main/img/img9.jpg)
 
 
